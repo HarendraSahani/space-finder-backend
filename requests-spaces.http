@@ -1,0 +1,42 @@
+@endpoint = https://0lvc1c04ug.execute-api.us-east-1.amazonaws.com/prod/
+@token = eyJraWQiOiJ6cGtDUjRiZVJXak1hY1wveDdUR0lKMTdaUjVmNUVrSEZaZjMyZlwvZ3ZEbmc9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiI0MTJhMGQ4ZC1jMzFmLTRkNDEtOTU0NS01MmY3ODAzNWYxOTIiLCJjb2duaXRvOmdyb3VwcyI6WyJhZG1pbnMiXSwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbVwvZXUtd2VzdC0xX2dSSVVvT2RMeCIsImNvZ25pdG86dXNlcm5hbWUiOiJiYXJvc2FudTIiLCJjb2duaXRvOnJvbGVzIjpbImFybjphd3M6aWFtOjoxNTE4NzM3NTYwMTY6cm9sZVwvU3BhY2VGaW5kZXItQ29nbml0b0FkbWluUm9sZTRDMTBGQkE0LVpPRUhCNEI3TVAzVCJdLCJhdWQiOiIzMzV2bWE1am1sdWRvNDJtbjI4OTVjdTViaCIsImV2ZW50X2lkIjoiMzk5NDEzMTUtM2EyNS00YTkyLTlkZTEtM2RlNWEyYTA3YWZhIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2MjMyNTA3NTUsImV4cCI6MTYyMzI1NDM1NSwiaWF0IjoxNjIzMjUwNzU1LCJlbWFpbCI6ImJhcm9zYW51MkBnbWFpbC5jb20ifQ.ctqIp6_XcldY-6uWjEuf31p94Sf2R7PJci3qy5CvwAzYPvHTwTKdAbnUH_yjJEcg8T8tWJOdXlEUPq9LtOiCf8v_nDCmQwCIq7IE_aQHF3_75crq3_0i7vhoj5YlNBJwvK6Xmjth3uA74tK2TbfeOVq2wdPJE90bRhppRDACKZEhqvcvQ_JNKGuFOcLxbPPCIYVquD9hr_qHsRErRc7GcN2YEju1XKzhCwSmpTvA45QqGHMWQcy82HEDlrpewRPhQtF77LR6n66t0pATNMYH-kIMocWK_K0PrFzP7ej6o3qJcKGHjvwm64y0eydSZReAzGyEFnRysIthALfduJVrYg
+
+GET {{endpoint}}/lambdaResource
+#Authorization: {{token}}
+###
+
+GET {{endpoint}}/spaces
+#Authorization: {{token}}
+###
+
+OPTIONS {{endpoint}}
+Authorization: {{token}}
+###
+
+GET {{endpoint}}/spaces?spaceId=6166afab-dede-4f84-b2c1-9ea14f04dafe
+//Authorization: {{token}}
+###
+
+POST {{endpoint}}/spaces/
+//Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "Mystique City",
+    "location" : "Harare"
+}
+###
+
+PUT {{endpoint}}/spaces?spaceId=5660455978271677
+//Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "location": "Updated Location"
+}
+###
+
+DELETE  {{endpoint}}/spaces?spaceId=5660455978271677
+//Authorization: {{token}}
+###
+
