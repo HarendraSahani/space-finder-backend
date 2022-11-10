@@ -1,0 +1,8 @@
+{
+    "ClientId": "ipa7uvm281670khvi9c24j91c", 
+    "AuthFlow": "USER_PASSWORD_AUTH",
+    "AuthParameters": {
+            "USERNAME": "spaceuser1",
+            "PASSWORD": "askjskT7f&"
+        }    
+    }

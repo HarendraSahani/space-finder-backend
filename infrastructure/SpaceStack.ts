@@ -1,12 +1,12 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { AuthorizationType, Cors, LambdaIntegration, MethodOptions, ResourceOptions, RestApi } from 'aws-cdk-lib/aws-apigateway'
+import { LambdaIntegration, RestApi,LambdaRestApi, MethodOptions, AuthorizationType } from 'aws-cdk-lib/aws-apigateway'
 //import { GenericTable } from './GenDynamoDbTable';
-
-import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
-import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda'
+import {AuthorizerWrapper} from './auth/AuthorizerWrapper';
+ 
+//import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda'
 import { join } from 'path'
-import { HealthCheckProtocol } from 'aws-cdk-lib/aws-globalaccelerator';
+
 import { GenDynamoDbTable } from './GenDynamoDbTable';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs'
 import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
@@ -14,13 +14,17 @@ import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
 export class SpaceStack extends Stack {
 
     private api = new RestApi(this, 'spaceApi');
+    
     /** 
      * private spacesTable = new GenDynamoDbTable(
         'SpaceTable',
         'spaceId',
         this)
    */
-
+    
+        //creating gateway api using latest library 
+    private authorizer : AuthorizerWrapper;
+    
     private spacesTable = new GenDynamoDbTable(this,{
         tableName : 'SpacesTable',
         primaryKey : 'spaceId',
@@ -52,6 +56,7 @@ export class SpaceStack extends Stack {
             handler : 'handler'
         }) 
         */
+       this.authorizer = new AuthorizerWrapper(this,this.api);
         const helloLambdaNodeJs = new NodejsFunction(this,'helloLambdaNodeJs',{
             entry : (join(__dirname,'..','services','node-lambda-ts','hello.ts')),
             handler : 'handler'
@@ -63,11 +68,32 @@ export class SpaceStack extends Stack {
         helloLambdaNodeJs.addToRolePolicy(s3ListPolicy);
         //putTableDynamo.addToRolePolicy(s3ListPolicy)
         
+        //this way we don't have to use LambdaIntegration to attach the lambda to gateway api separately
+        const awsGWApi = new LambdaRestApi(this, 'spaceGWApi',{
+            handler: helloLambdaNodeJs,
+            proxy: false
+          })
+
+          const items = awsGWApi.root.addResource('items');
+          items.addMethod('GET');
+
+
+        //adding authorizer to 'lambdaresource' api
+        // step 1 : create optionObject to be attached to rest api
+        ///** 
+        const optionsWithAuthorizer : MethodOptions = {
+            authorizationType : AuthorizationType.COGNITO,
+            authorizer : {
+                authorizerId : this.authorizer.cognitoAuthorizer.authorizerId
+            }
+        } //*/
         //integration with Lambda:
         const lambdaIntegration = new LambdaIntegration(helloLambdaNodeJs)
         const helloLambdaResource = this.api.root.addResource('lambdaResource')
-        helloLambdaResource.addMethod('GET', lambdaIntegration);
-        
+        //without any authorization
+        //helloLambdaResource.addMethod('GET', lambdaIntegration);
+        //with authorizer
+        helloLambdaResource.addMethod('GET', lambdaIntegration,optionsWithAuthorizer);
         //Spaces API integrations:
         const spaceResource = this.api.root.addResource('spaces');
         spaceResource.addMethod('POST',this.spacesTable.createLambdaIntegration);
